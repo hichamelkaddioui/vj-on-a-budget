@@ -209,6 +209,21 @@ void setShouldSync() {
 	shouldSync = true;
 }
 
+void sendAllToSerial() {
+	Serial.print(COMMAND_UPDATE_TO_SERIAL);
+	Serial.print("P=");
+	Serial.print(selectedProgram);
+	Serial.print("&S=");
+	Serial.print(programs[selectedProgram].numberOfSteps);
+	Serial.print("&B=");
+	Serial.print(bpm);
+	Serial.print("&M=");
+	Serial.print(beatMultiplier);
+	Serial.print("&A=");
+	Serial.print(animationMultiplier);
+	Serial.println();
+}
+
 void readFromSerial() {
 	if (Serial.available() <= 0) {
 		return;
@@ -250,6 +265,8 @@ void resetLoop() {
 	stepNumber = 1;
 
 	chrono.restart();
+
+	sendAllToSerial();
 }
 
 /*
