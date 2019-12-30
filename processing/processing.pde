@@ -38,7 +38,6 @@ RadioButton mRadioButton;
 RadioButton aRadioButton;
 
 boolean isEditingBpm;
-float editingBpm;
 CallbackListener bpmKnobCallbackListener;
 
 
@@ -51,16 +50,14 @@ public void applybpmTextField() {
 void setupBpmControl() {
 	PFont bigFont = createFont("DejaVu Sans Mono", 35);
 
-	isEditingBpm = false;
-
 	bpmKnobCallbackListener = new CallbackListener() {
 		public void controlEvent(CallbackEvent event) {
 			if (event.getAction() == ControlP5.ACTION_RELEASED) {
 				isEditingBpm = false;
 
-				arduino.write("B:" + editingBpm);
+				arduino.write("B:" + event.getController().getValue());
 
-				event.getController().setValue(editingBpm);
+				event.getController().setValue(bpm);
 			} else if (event.getAction() == ControlP5.ACTION_PRESS) {
 				isEditingBpm = true;
 
@@ -243,6 +240,8 @@ void updateParameter(String newParameterValue) {
 	} else if ("S".equals(parameter)) {
 		numberOfSteps = parseInt(value);
 	} else if ("B".equals(parameter)) {
+		if (isEditingBpm) return;
+
 		bpm = float(value);
 	} else if ("M".equals(parameter)) {
 		beatMultiplier = float(value);
@@ -275,11 +274,11 @@ void controlEvent(ControlEvent controlEvent) {
 	if (controlEvent.isFrom(bpmKnob)) {
 		float newBpm = controlEvent.getController().getValue();
 
-		if (bpm == newBpm) {
+		if (bpm == newBpm || !isEditingBpm) {
 			return;
 		}
 
-		editingBpm = newBpm;
+		bpm = newBpm;
 	}
 
 	if (controlEvent.isFrom(bpmTextField)) {
