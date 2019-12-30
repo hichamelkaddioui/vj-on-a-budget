@@ -18,6 +18,41 @@ void setupArduino() {
 	arduino = new Serial(this, portName, 9600);
 }
 
+void setupCp5() {
+	cp5 = new ControlP5(this);
+
+	cp5.addNumberbox("program")
+	.setPosition(100, 160)
+	.setMin(0)
+	.setMax(4)
+	.setSize(100, 20)
+	.setScrollSensitivity(1.1)
+	.setValue(1)
+	;
+}
+
+void setup() {
+	size(700, 400);
+	noStroke();
+	background(0, 0, 0);
+
+	setupArduino();
+
+	setupCp5();
+}
+
+void draw() {
+	cp5.getController("program").setValue(selectedProgram);
+}
+
+void serialEvent(Serial arduino) {
+	message = arduino.readStringUntil('\n');
+
+	if (null == message) return;
+
+	updateModelFromMessage(message);
+}
+
 void updateParameter(String newParameterValue) {
 	String[] splitParameterValue = split(newParameterValue, '=');
 
@@ -55,47 +90,6 @@ void updateModelFromMessage(String message) {
 	for (int i = 0; i < values.length; i++) {
 		updateParameter(values[i]);
 	}
-}
-
-void readFromSerial() {
-	if (arduino.available() == 0) {
-		return;
-	}
-
-	message = arduino.readStringUntil('\n');
-
-	if (null == message) return;
-
-	updateModelFromMessage(message);
-}
-
-void setupCp5() {
-	cp5 = new ControlP5(this);
-
-	cp5.addNumberbox("program")
-	.setPosition(100, 160)
-	.setMin(0)
-	.setMax(4)
-	.setSize(100, 20)
-	.setScrollSensitivity(1.1)
-	.setValue(1)
-	;
-}
-
-void setup() {
-	size(700, 400);
-	noStroke();
-	background(0, 0, 0);
-
-	setupArduino();
-
-	setupCp5();
-}
-
-void draw() {
-	readFromSerial();
-
-	cp5.getController("program").setValue(selectedProgram);
 }
 
 void controlEvent(ControlEvent controlEvent) {
