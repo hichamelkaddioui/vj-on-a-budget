@@ -75,7 +75,7 @@ int selectedProgram;
 
 void initPrograms() {
 	stepNumber = 1;
-	selectedProgram = 0;
+	selectedProgram = 2;
 }
 
 void black(int stepNumber) {
@@ -153,7 +153,7 @@ void runProgram(int elapsed, int animationLength) {
 /*
  * TIMING
  */
-int bpm;
+double bpm;
 double beatMultiplier;
 double animationMultiplier;
 bool shouldSync;
@@ -178,7 +178,7 @@ void setProgramFromSerial(int newSelectedProgram) {
 	Serial.println();
 }
 
-void setBpmFromSerial(int newBpm) {
+void setBpmFromSerial(double newBpm) {
 	bpm = constrain(newBpm, BPM_MIN, BPM_MAX);
 
 	Serial.print(COMMAND_UPDATE_TO_SERIAL);
@@ -235,7 +235,7 @@ void readFromSerial() {
 	if (command == COMMAND_PROGRAM) {
 		setProgramFromSerial(value.toInt());
 	} else if (command == COMMAND_BPM) {
-		setBpmFromSerial(value.toInt());
+		setBpmFromSerial(value.toDouble());
 	} else if (command == COMMAND_BEAT_MULTIPLIER) {
 		setBeatMultiplierFromSerial(value.toDouble());
 	} else if (command == COMMAND_ANIMATION_MULTIPLIER) {
