@@ -5,7 +5,6 @@ Serial arduino;
 String message;
 
 ControlP5 cp5;
-public float numberboxValue = 100;
 
 int selectedProgram;
 int numberOfSteps;
