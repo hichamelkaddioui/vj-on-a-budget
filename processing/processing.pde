@@ -11,6 +11,7 @@ int numberOfSteps;
 double bpm;
 double beatMultiplier;
 double animationMultiplier;
+boolean isWaitingForArduinoValues = true;
 
 void setupArduino() {
 	String portName = Serial.list()[2];
@@ -41,7 +42,9 @@ void setup() {
 }
 
 void draw() {
-	cp5.getController("program").setValue(selectedProgram);
+	if (!isWaitingForArduinoValues) {
+		cp5.getController("program").setValue(selectedProgram);
+	}
 }
 
 void serialEvent(Serial arduino) {
@@ -89,6 +92,8 @@ void updateModelFromMessage(String message) {
 	for (int i = 0; i < values.length; i++) {
 		updateParameter(values[i]);
 	}
+
+	isWaitingForArduinoValues = false;
 }
 
 void controlEvent(ControlEvent controlEvent) {
@@ -99,5 +104,7 @@ void controlEvent(ControlEvent controlEvent) {
 		if ("program".equals(controllerName) && value != selectedProgram) {
 			arduino.write("P:" + (int) value);
 		}
+
+		isWaitingForArduinoValues = true;
 	}
 }
