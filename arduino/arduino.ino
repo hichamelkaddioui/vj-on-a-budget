@@ -8,7 +8,7 @@
 #define COMMAND_BEAT_MULTIPLIER       "M"
 #define COMMAND_ANIMATION_MULTIPLIER  "A"
 #define COMMAND_SYNC                  "S"
-#define COMMAND_TURN_ON_LED						"L"
+#define COMMAND_TURN_ON_LED                                             "L"
 #define COMMAND_UPDATE_TO_SERIAL      "U:"
 
 #define BPM_MIN                   50
@@ -95,6 +95,30 @@ void sweep(int stepNumber) {
 	}
 }
 
+void columnSweep(int stepNumber) {
+	byte ledState;
+
+	if (1 == stepNumber) {
+		for (int i = 0; i < numberOfLeds; i++) {
+			ledState = i < 3 ? HIGH : LOW;
+
+			digitalWrite(leds[i], ledState);
+		}
+	} else if (2 == stepNumber) {
+		for (int i = 0; i < numberOfLeds; i++) {
+			ledState = 3 <= i && i < 6 ? HIGH : LOW;
+
+			digitalWrite(leds[i], ledState);
+		}
+	} else {
+		for (int i = 0; i < numberOfLeds; i++) {
+			ledState = 6 <= i ? HIGH : LOW;
+
+			digitalWrite(leds[i], ledState);
+		}
+	}
+}
+
 void fill(int stepNumber) {
 	int ledIndex;
 	byte state;
@@ -155,6 +179,7 @@ program programs[] = {
 	{ 1, black },
 	{ 1, blink },
 	{ numberOfLeds, sweep },
+	{ 3, columnSweep },
 	{ 2 * numberOfLeds, fill },
 	{ 2, alternate },
 	{ numberOfLeds, random },
