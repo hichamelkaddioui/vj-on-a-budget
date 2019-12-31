@@ -1,10 +1,11 @@
 import processing.serial.*;
 import controlP5.*;
 
-Serial arduino;
-String message;
-
 ControlP5 cp5;
+
+/*
+ * GUI
+ */
 
 final float MIN_BPM = 50f;
 final float MAX_BPM = 200f;
@@ -15,11 +16,6 @@ float bpm;
 int beatMultiplier;
 int animationMultiplier;
 boolean isWaitingForArduinoValues = true;
-
-void setupArduino() {
-	String portName = Serial.list()[2];
-	arduino = new Serial(this, portName, 9600);
-}
 
 final int colorBlack = color(17, 17, 20);
 final int colorDark = color(20, 33, 61);
@@ -38,7 +34,9 @@ RadioButton aRadioButton;
 boolean isEditingBpm;
 CallbackListener bpmKnobCallbackListener;
 
-public void applybpmTextField() {
+// BPM Control
+
+public void applyBpmTextField() {
 	float inField = Float.parseFloat(bpmTextField.getText());
 	arduino.write("B:" + inField);
 	bpmTextField.clear();
@@ -63,7 +61,7 @@ void setupBpmControl() {
 
 	bpmTextField.getCaptionLabel().align(ControlP5.RIGHT, ControlP5.CENTER);
 
-	cp5.addBang("applybpmTextField")
+	cp5.addBang("applyBpmTextField")
 	.setPosition(240, 70)
 	.setSize(120, 40)
 	.setColorLabel(colorBlack)
@@ -113,6 +111,8 @@ void setupBpmControl() {
 	               .setColor(colorLight);
 }
 
+// Beat Multiplier Control
+
 void setupBeatMultiplierControl() {
 	mRadioButton = cp5.addRadioButton("mRadioButton")
 	               .setPosition(21, 420)
@@ -146,6 +146,8 @@ void setupBeatMultiplierControl() {
 	}
 }
 
+// Animation Multiplier Control
+
 void setupAnimationMultiplierControl() {
 	aRadioButton = cp5.addRadioButton("aRadioButton")
 	               .setPosition(21, 620)
@@ -178,6 +180,8 @@ void setupAnimationMultiplierControl() {
 	}
 }
 
+// Sync Control
+
 public void syncButton() {
 	arduino.write('S');
 }
@@ -193,6 +197,16 @@ void setupSyncButton() {
 	;
 }
 
+void setGuiFromModel() {
+	if (!isEditingBpm) {
+		bpmTextLabel.setStringValue(bpm + " BPM");
+		bpmKnob.setValue(bpm);
+	};
+
+	mRadioButton.activate(beatMultiplier);
+	aRadioButton.activate(animationMultiplier);
+}
+
 void setupCp5() {
 	cp5 = new ControlP5(this);
 
@@ -205,40 +219,19 @@ void setupCp5() {
 	setupBpmControl();
 	setupBeatMultiplierControl();
 	setupAnimationMultiplierControl();
+	setupSyncButton();
 
 	textFont(font);
 }
 
-void setup() {
-	size(700, 800);
-	smooth();
-	noStroke();
-	background(0);
+/*
+ * Arduino communication
+ */
 
-	setupArduino();
+Serial arduino;
+String message;
 
-	setupCp5();
-}
-
-void draw() {
-	background(0);
-
-	if (isWaitingForArduinoValues) {
-		return;
-	}
-
-	setGuiFromModel();
-}
-
-void serialEvent(Serial arduino) {
-	message = arduino.readStringUntil('\n');
-
-	if (null == message) return;
-
-	updateModelFromMessage(message);
-}
-
-void updateParameter(String newParameterValue) {
+void updateParameterFromArduino(String newParameterValue) {
 	String[] splitParameterValue = split(trim(newParameterValue), '=');
 
 	if (splitParameterValue.length < 2) {
@@ -273,13 +266,45 @@ void updateModelFromMessage(String message) {
 	println(values);
 
 	for (int i = 0; i < values.length; i++) {
-		updateParameter(values[i]);
+		updateParameterFromArduino(values[i]);
 	}
 
 	isWaitingForArduinoValues = false;
 }
 
+void setupArduino() {
+	String portName = Serial.list()[2];
+
+	arduino = new Serial(this, portName, 9600);
+}
+
+/*
+ * Global Handlers
+ */
+
+void serialEvent(Serial arduino) {
+	message = arduino.readStringUntil('\n');
+
+	if (null == message) return;
+
+	updateModelFromMessage(message);
+}
+
 void controlEvent(ControlEvent controlEvent) {
+	if (controlEvent.isFrom(bpmKnob)) {
+		float newBpm = controlEvent.getController().getValue();
+
+		if (bpm == newBpm || !isEditingBpm) {
+			return;
+		}
+
+		bpm = newBpm;
+	}
+
+	if (controlEvent.isFrom(bpmTextField)) {
+		applyBpmTextField();
+	}
+
 	if (controlEvent.isFrom(mRadioButton)) {
 		int newBeatMultiplier = int(controlEvent.getValue());
 
@@ -300,33 +325,24 @@ void controlEvent(ControlEvent controlEvent) {
 		}
 	}
 
-	if (!controlEvent.isController()) {
-		return;
-	}
-
-	if (controlEvent.isFrom(bpmKnob)) {
-		float newBpm = controlEvent.getController().getValue();
-
-		if (bpm == newBpm || !isEditingBpm) {
-			return;
-		}
-
-		bpm = newBpm;
-	}
-
-	if (controlEvent.isFrom(bpmTextField)) {
-		applybpmTextField();
-	}
-
 	isWaitingForArduinoValues = true;
 }
 
-void setGuiFromModel() {
-	if (!isEditingBpm) {
-		bpmTextLabel.setStringValue(bpm + " BPM");
-		bpmKnob.setValue(bpm);
-	};
+void setup() {
+	fullScreen();
+	smooth();
+	noStroke();
+	background(0);
 
-	mRadioButton.activate(beatMultiplier);
-	aRadioButton.activate(animationMultiplier);
+	setupArduino();
+
+	setupCp5();
+}
+
+void draw() {
+	background(0);
+
+	if (!isWaitingForArduinoValues) {
+		setGuiFromModel();
+	}
 }
