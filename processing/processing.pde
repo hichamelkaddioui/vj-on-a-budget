@@ -29,6 +29,7 @@ Textfield bpmTextField;
 Knob bpmKnob;
 Textlabel bpmTextLabel;
 
+RadioButton pRadioButton;
 RadioButton mRadioButton;
 RadioButton aRadioButton;
 
@@ -112,6 +113,39 @@ void setupBpmControl() {
 	               .setColor(colorLight);
 }
 
+// Program Control
+
+void setupProgramControl() {
+	int groupX = width / 2 + margin;
+	int groupY = height / 2;
+
+	cp5.addTextlabel("TitleProgram")
+	.setText("Program")
+	.setPosition(groupX, groupY)
+	.setSize(80, 40)
+	.setColor(colorLight)
+	;
+
+	pRadioButton = cp5.addRadioButton("pRadioButton")
+	               .setPosition(groupX, groupY + 60)
+	               .setBackgroundHeight(40)
+	               .setItemsPerRow(4)
+	               .setSpacingColumn(20)
+	               .setSpacingRow(20)
+	               .setColorActive(colorBlue)
+	               .setColorLabel(colorBlack)
+	               .setColorBackground(colorLight)
+	               .setNoneSelectedAllowed(false)
+	;
+
+	for (int i = 0; i < 4; i++) {
+		Toggle toggleProgram = cp5.addToggle("P" + i).setLabel(i + "").setSize(100, 50);
+		toggleProgram.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+
+		pRadioButton.addItem(toggleProgram, i);
+	}
+}
+
 // Beat Multiplier Control
 
 void setupBeatMultiplierControl() {
@@ -145,7 +179,7 @@ void setupBeatMultiplierControl() {
 		Toggle toggleBeatMultiplier = cp5.addToggle("M" + label).setLabel(label).setSize(100, 50);
 		toggleBeatMultiplier.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
 
-		mRadioButton.addItem(toggleBeatMultiplier, i).setLabel(label);
+		mRadioButton.addItem(toggleBeatMultiplier, i);
 	}
 }
 
@@ -181,7 +215,7 @@ void setupAnimationMultiplierControl() {
 		Toggle toggleAnimationMultiplier = cp5.addToggle("A" + label).setLabel(label).setSize(100, 50);
 		toggleAnimationMultiplier.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
 
-		aRadioButton.addItem(toggleAnimationMultiplier, i).setLabel(label);
+		aRadioButton.addItem(toggleAnimationMultiplier, i);
 	}
 }
 
@@ -208,6 +242,7 @@ void setGuiFromModel() {
 		bpmKnob.setValue(bpm);
 	};
 
+	pRadioButton.activate(selectedProgram);
 	mRadioButton.activate(beatMultiplier);
 	aRadioButton.activate(animationMultiplier);
 }
@@ -221,6 +256,7 @@ void setupCp5() {
 	cp5.setColorBackground(colorBlack);
 	cp5.setColorForeground(colorLight);
 
+	setupProgramControl();
 	setupBpmControl();
 	setupBeatMultiplierControl();
 	setupAnimationMultiplierControl();
@@ -308,6 +344,16 @@ void controlEvent(ControlEvent controlEvent) {
 
 	if (controlEvent.isFrom(bpmTextField)) {
 		applyBpmTextField();
+	}
+
+	if (controlEvent.isFrom(pRadioButton)) {
+		int newSelectedProgram = int(controlEvent.getValue());
+
+		if (selectedProgram != newSelectedProgram) {
+			selectedProgram = newSelectedProgram;
+
+			arduino.write("P:" + selectedProgram);
+		}
 	}
 
 	if (controlEvent.isFrom(mRadioButton)) {
