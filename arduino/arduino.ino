@@ -16,13 +16,13 @@
 
 #define FULL_ON_BUTTON_PIN        22
 
-double BEAT_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1, 2, 4, 8};
-double ANIMATION_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1 };
+double BEAT_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1.0, 2.0, 4.0, 8.0 };
+double ANIMATION_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1.0 };
 
 /*
  * LEDS
  */
-int leds[] = { 2, 3, 4, 5 };
+int leds[] = { 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 int numberOfLeds = ARRAY_SIZE(leds);
 bool shouldBeFullOn;
 bool shouldBeFullOff;
