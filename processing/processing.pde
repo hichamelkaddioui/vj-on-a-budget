@@ -17,6 +17,7 @@ int beatMultiplier;
 int animationMultiplier;
 boolean isWaitingForArduinoValues = true;
 
+final int margin = 20;
 final int colorBlack = color(17, 17, 20);
 final int colorDark = color(20, 33, 61);
 final int colorBlue = color(86, 201, 193);
@@ -114,11 +115,19 @@ void setupBpmControl() {
 // Beat Multiplier Control
 
 void setupBeatMultiplierControl() {
+	int groupY = height / 2;
+
+	cp5.addTextlabel("TitleBeatMultiplier")
+	.setText("Loop length in beats")
+	.setPosition(margin, groupY)
+	.setSize(80, 40)
+	.setColor(colorLight)
+	;
+
 	mRadioButton = cp5.addRadioButton("mRadioButton")
-	               .setPosition(21, 420)
-	               .setSize(70, 40)
+	               .setPosition(margin, groupY + 60)
 	               .setBackgroundHeight(40)
-	               .setItemsPerRow(5)
+	               .setItemsPerRow(4)
 	               .setSpacingColumn(20)
 	               .setSpacingRow(20)
 	               .setColorActive(colorBlue)
@@ -126,12 +135,6 @@ void setupBeatMultiplierControl() {
 	               .setColorBackground(colorLight)
 	               .setNoneSelectedAllowed(false)
 	;
-
-	cp5.addTextlabel("TitleBeatMultiplier")
-	.setText("Beat Multiplier")
-	.setPosition(18, 380)
-	.setSize(80, 40)
-	.setColor(colorLight);
 
 	String label;
 	float value;
@@ -149,8 +152,16 @@ void setupBeatMultiplierControl() {
 // Animation Multiplier Control
 
 void setupAnimationMultiplierControl() {
+	int groupY = 2 * height / 3 + 50;
+
+	cp5.addTextlabel("TitleAnimationMultiplier")
+	.setText("Animation length")
+	.setPosition(margin, groupY)
+	.setSize(80, 40)
+	.setColor(colorLight);
+
 	aRadioButton = cp5.addRadioButton("aRadioButton")
-	               .setPosition(21, 620)
+	               .setPosition(margin, groupY + 60)
 	               .setSize(70, 40)
 	               .setBackgroundHeight(40)
 	               .setItemsPerRow(5)
@@ -160,12 +171,6 @@ void setupAnimationMultiplierControl() {
 	               .setColorLabel(colorBlack)
 	               .setNoneSelectedAllowed(false)
 	               .setColorBackground(colorLight);
-
-	cp5.addTextlabel("TitleAnimationMultiplier")
-	.setText("Animation Multiplier")
-	.setPosition(18, 580)
-	.setSize(80, 40)
-	.setColor(colorLight);
 
 	String label;
 	float value;
@@ -183,13 +188,13 @@ void setupAnimationMultiplierControl() {
 // Sync Control
 
 public void syncButton() {
-	arduino.write('S');
+	arduino.write("S:");
 }
 
 void setupSyncButton() {
 	cp5.addBang("syncButton")
-	.setPosition(600, 20)
-	.setSize(80, 40)
+	.setPosition(margin, height / 3)
+	.setSize(width / 4, 100)
 	.setColorLabel(colorBlack)
 	.setColorActive(colorBlue)
 	.setLabel("SYNC")
