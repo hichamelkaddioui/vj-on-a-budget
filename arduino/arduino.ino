@@ -12,12 +12,11 @@
 
 #define BPM_MIN                   50
 #define BPM_MAX                   200
-#define BEAT_MULTIPLIER_MIN       1.0 / 16.0
-#define BEAT_MULTIPLIER_MAX       16
-#define ANIMATION_MULTIPLIER_MIN  1.0 / 16.0
-#define ANIMATION_MULTIPLIER_MAX  1.0
 
 #define FULL_ON_BUTTON_PIN        22
+
+double BEAT_MULTIPLIERS[] = { 1.0 / 8, 1.0 / 4, 1.0 / 3, 1.0 / 2, 1, 2, 3, 4, 8};
+double ANIMATION_MULTIPLIERS[] = { 1.0 / 8, 1.0 / 4, 1.0 / 3, 1.0 / 2, 1 };
 
 /*
  * LEDS
@@ -154,16 +153,17 @@ void runProgram(int elapsed, int animationLength) {
  * TIMING
  */
 double bpm;
-double beatMultiplier;
+int beatMultiplierIndex;
 double animationMultiplier;
+int animationMultiplierIndex;
 bool shouldSync;
 String command;
 String value;
 
 void initAnimation() {
 	bpm = 120;
-	beatMultiplier = 1.0;
-	animationMultiplier = 0.5;
+	beatMultiplierIndex = 4;
+	animationMultiplierIndex = 3;
 	shouldSync = false;
 }
 
@@ -187,21 +187,25 @@ void setBpmFromSerial(double newBpm) {
 	Serial.println();
 }
 
-void setBeatMultiplierFromSerial(double newBeatMultiplier) {
-	beatMultiplier = constrain(newBeatMultiplier, BEAT_MULTIPLIER_MIN, BEAT_MULTIPLIER_MAX);
+void setBeatMultiplierFromSerial(int value) {
+	int newBeatMultiplierIndex = constrain(value, 0, ARRAY_SIZE(BEAT_MULTIPLIERS) - 1);
+
+	beatMultiplierIndex = newBeatMultiplierIndex;
 
 	Serial.print(COMMAND_UPDATE_TO_SERIAL);
 	Serial.print("M=");
-	Serial.print(beatMultiplier);
+	Serial.print(newBeatMultiplierIndex);
 	Serial.println();
 }
 
-void setAnimationMultiplierFromSerial(double newAnimationMultiplier) {
-	animationMultiplier = constrain(newAnimationMultiplier, ANIMATION_MULTIPLIER_MIN, ANIMATION_MULTIPLIER_MAX);
+void setAnimationMultiplierFromSerial(int value) {
+	int newAnimationMultiplierIndex = constrain(value, 0, ARRAY_SIZE(ANIMATION_MULTIPLIERS) - 1);
+
+	animationMultiplierIndex = newAnimationMultiplierIndex;
 
 	Serial.print(COMMAND_UPDATE_TO_SERIAL);
 	Serial.print("A=");
-	Serial.print(animationMultiplier);
+	Serial.print(animationMultiplierIndex);
 	Serial.println();
 }
 
@@ -218,9 +222,9 @@ void sendAllToSerial() {
 	Serial.print("&B=");
 	Serial.print(bpm);
 	Serial.print("&M=");
-	Serial.print(beatMultiplier);
+	Serial.print(beatMultiplierIndex);
 	Serial.print("&A=");
-	Serial.print(animationMultiplier);
+	Serial.print(animationMultiplierIndex);
 	Serial.println();
 }
 
@@ -237,9 +241,9 @@ void readFromSerial() {
 	} else if (command == COMMAND_BPM) {
 		setBpmFromSerial(value.toDouble());
 	} else if (command == COMMAND_BEAT_MULTIPLIER) {
-		setBeatMultiplierFromSerial(value.toDouble());
+		setBeatMultiplierFromSerial(value.toInt());
 	} else if (command == COMMAND_ANIMATION_MULTIPLIER) {
-		setAnimationMultiplierFromSerial(value.toDouble());
+		setAnimationMultiplierFromSerial(value.toInt());
 	} else if (command == COMMAND_SYNC) {
 		setShouldSync();
 	}
@@ -254,10 +258,15 @@ bool isTimeOff;
 LightChrono chrono;
 
 int getTotalLength() {
+	double beatMultiplier = BEAT_MULTIPLIERS[beatMultiplierIndex];
+
 	return (long int) (beatMultiplier * 1000 * 60 / bpm);
 }
 
 int getAnimationLength() {
+	double beatMultiplier = BEAT_MULTIPLIERS[beatMultiplierIndex];
+	double animationMultiplier = ANIMATION_MULTIPLIERS[animationMultiplierIndex];
+
 	return (long int) (animationMultiplier * beatMultiplier * 1000 * 60 / bpm);
 }
 

@@ -12,8 +12,8 @@ final float MAX_BPM = 200f;
 int selectedProgram;
 int numberOfSteps;
 float bpm;
-float beatMultiplier;
-float animationMultiplier;
+int beatMultiplier;
+int animationMultiplier;
 boolean isWaitingForArduinoValues = true;
 
 void setupArduino() {
@@ -26,8 +26,6 @@ final int colorDark = color(20, 33, 61);
 final int colorBlue = color(86, 201, 193);
 final int colorLight = color(249, 221, 214);
 
-final float[] beatMultiplierValues = { 1f / 8f, 1f / 4f, 1f / 3f, 1f / 2f, 1f, 2f, 3f, 4f, 8f };
-final float[] animationMultiplierValues = { 1f / 8f, 1f / 4f, 1f / 3f, 1f / 2f, 1f };
 final String[] multiplierLabels = { "1/8", "1/4", "1/3", "1/2", "1", "2", "3", "4", "8" };
 
 Textfield bpmTextField;
@@ -40,7 +38,6 @@ RadioButton aRadioButton;
 boolean isEditingBpm;
 CallbackListener bpmKnobCallbackListener;
 
-
 public void applybpmTextField() {
 	float inField = Float.parseFloat(bpmTextField.getText());
 	arduino.write("B:" + inField);
@@ -50,48 +47,52 @@ public void applybpmTextField() {
 void setupBpmControl() {
 	PFont bigFont = createFont("DejaVu Sans Mono", 35);
 
-	bpmKnobCallbackListener = new CallbackListener() {
-		public void controlEvent(CallbackEvent event) {
-			if (event.getAction() == ControlP5.ACTION_RELEASED) {
-				isEditingBpm = false;
-
-				arduino.write("B:" + event.getController().getValue());
-
-				event.getController().setValue(bpm);
-			} else if (event.getAction() == ControlP5.ACTION_PRESS) {
-				isEditingBpm = true;
-
-				println("enter");
-			}
-		}
-	};
-
 	bpmTextField = cp5.addTextfield("bpmTextField")
-									   .setPosition(20, 70)
-									   .setSize(200, 40)
-									   .setFocus(true)
-									   .setInputFilter(2)
-									   .setDefaultValue(0.00)
-									   .setValue(0.00)
-									   .setLabel("BPM")
-									   .setColor(colorLight)
-									   .setDecimalPrecision(1)
-									   .setColorLabel(colorLight)
-									   .setColorActive(colorBlue)
-										 ;
+	               .setPosition(20, 70)
+	               .setSize(200, 40)
+	               .setFocus(true)
+	               .setInputFilter(2)
+	               .setDefaultValue(0.00)
+	               .setValue(0.00)
+	               .setLabel("BPM")
+	               .setColor(colorLight)
+	               .setDecimalPrecision(1)
+	               .setColorLabel(colorLight)
+	               .setColorActive(colorBlue)
+	;
 
 	bpmTextField.getCaptionLabel().align(ControlP5.RIGHT, ControlP5.CENTER);
 
 	cp5.addBang("applybpmTextField")
-	 	 .setPosition(240, 70)
-		 .setSize(80, 40)
-		 .setColorLabel(colorBlack)
-		 .setColorActive(colorBlue)
-		 .setLabel("APPLY")
-		 .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
-		 ;
+	.setPosition(240, 70)
+	.setSize(120, 40)
+	.setColorLabel(colorBlack)
+	.setColorActive(colorBlue)
+	.setLabel("Set BPM")
+	.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
+	;
 
-	bpmKnob = cp5.addKnob("applybpmknob")
+	bpmKnobCallbackListener = new CallbackListener() {
+		public void controlEvent(CallbackEvent event) {
+			if (event.getAction() == ControlP5.ACTION_PRESS) {
+				isEditingBpm = true;
+
+				return;
+			}
+
+			if (event.getAction() == ControlP5.ACTION_RELEASED) {
+				isEditingBpm = false;
+
+				float newBpm = event.getController().getValue();
+
+				arduino.write("B:" + newBpm);
+
+				event.getController().setValue(newBpm);
+			}
+		}
+	};
+
+	bpmKnob = cp5.addKnob("bpmKnob")
 	          .setRange(MIN_BPM, MAX_BPM)
 	          .setPosition(80, 130)
 	          .setRadius(50)
@@ -124,7 +125,6 @@ void setupBeatMultiplierControl() {
 	               .setColorLabel(colorBlack)
 	               .setColorBackground(colorLight)
 	               .setNoneSelectedAllowed(false)
-	               .setValue(1f)
 	;
 
 	cp5.addTextlabel("TitleBeatMultiplier")
@@ -136,14 +136,13 @@ void setupBeatMultiplierControl() {
 	String label;
 	float value;
 
-	for (int i = 0; i < beatMultiplierValues.length; i++) {
+	for (int i = 0; i < multiplierLabels.length; i++) {
 		label = multiplierLabels[i];
-		value = beatMultiplierValues[i];
 
-		Toggle toggleBeatMultiplier = cp5.addToggle("M " + label).setLabel(label).setSize(100, 50);
+		Toggle toggleBeatMultiplier = cp5.addToggle("M" + label).setLabel(label).setSize(100, 50);
 		toggleBeatMultiplier.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
 
-		mRadioButton.addItem(toggleBeatMultiplier, value).setLabel(label);
+		mRadioButton.addItem(toggleBeatMultiplier, i).setLabel(label);
 	}
 }
 
@@ -169,15 +168,29 @@ void setupAnimationMultiplierControl() {
 	String label;
 	float value;
 
-	for (int i = 0; i < animationMultiplierValues.length; i++) {
+	for (int i = 0; i < multiplierLabels.length / 2 + 1; i++) {
 		label = multiplierLabels[i];
-		value = animationMultiplierValues[i];
 
-		Toggle toggleAnimationMultiplier = cp5.addToggle("A " + label).setLabel(label).setSize(100, 50);
+		Toggle toggleAnimationMultiplier = cp5.addToggle("A" + label).setLabel(label).setSize(100, 50);
 		toggleAnimationMultiplier.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
 
-		aRadioButton.addItem(toggleAnimationMultiplier, value).setLabel(label);
+		aRadioButton.addItem(toggleAnimationMultiplier, i).setLabel(label);
 	}
+}
+
+public void syncButton() {
+	arduino.write('S');
+}
+
+void setupSyncButton() {
+	cp5.addBang("syncButton")
+	.setPosition(600, 20)
+	.setSize(80, 40)
+	.setColorLabel(colorBlack)
+	.setColorActive(colorBlue)
+	.setLabel("SYNC")
+	.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
+	;
 }
 
 void setupCp5() {
@@ -226,7 +239,7 @@ void serialEvent(Serial arduino) {
 }
 
 void updateParameter(String newParameterValue) {
-	String[] splitParameterValue = split(newParameterValue, '=');
+	String[] splitParameterValue = split(trim(newParameterValue), '=');
 
 	if (splitParameterValue.length < 2) {
 		return;
@@ -239,14 +252,12 @@ void updateParameter(String newParameterValue) {
 		selectedProgram = parseInt(value);
 	} else if ("S".equals(parameter)) {
 		numberOfSteps = parseInt(value);
-	} else if ("B".equals(parameter)) {
-		if (isEditingBpm) return;
-
+	} else if ("B".equals(parameter) && !isEditingBpm) {
 		bpm = float(value);
 	} else if ("M".equals(parameter)) {
-		beatMultiplier = float(value);
+		beatMultiplier = parseInt(value);
 	} else if ("A".equals(parameter)) {
-		animationMultiplier = float(value);
+		animationMultiplier = parseInt(value);
 	}
 }
 
@@ -259,6 +270,8 @@ void updateModelFromMessage(String message) {
 
 	String[] values = split(splitMessage[1], '&');
 
+	println(values);
+
 	for (int i = 0; i < values.length; i++) {
 		updateParameter(values[i]);
 	}
@@ -267,6 +280,26 @@ void updateModelFromMessage(String message) {
 }
 
 void controlEvent(ControlEvent controlEvent) {
+	if (controlEvent.isFrom(mRadioButton)) {
+		int newBeatMultiplier = int(controlEvent.getValue());
+
+		if (beatMultiplier != newBeatMultiplier) {
+			beatMultiplier = newBeatMultiplier;
+
+			arduino.write("M:" + beatMultiplier);
+		}
+	}
+
+	if (controlEvent.isFrom(aRadioButton)) {
+		int newAnimationMultiplier = int(controlEvent.getValue());
+
+		if (animationMultiplier != newAnimationMultiplier) {
+			animationMultiplier = newAnimationMultiplier;
+
+			arduino.write("A:" + animationMultiplier);
+		}
+	}
+
 	if (!controlEvent.isController()) {
 		return;
 	}
@@ -289,8 +322,11 @@ void controlEvent(ControlEvent controlEvent) {
 }
 
 void setGuiFromModel() {
-	if (isEditingBpm) return;
+	if (!isEditingBpm) {
+		bpmTextLabel.setStringValue(bpm + " BPM");
+		bpmKnob.setValue(bpm);
+	};
 
-	bpmTextLabel.setStringValue(bpm + " BPM");
-	bpmKnob.setValue(bpm);
+	mRadioButton.activate(beatMultiplier);
+	aRadioButton.activate(animationMultiplier);
 }
