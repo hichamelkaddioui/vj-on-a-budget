@@ -18,9 +18,9 @@
 
 | Variation   | Parameters     |
 | :---------- | :------------- |
-| Strobe      | `b=0.5&a=0.75` |
-| Short blink | `b=1&a=0.25`   |
-| Long blink  | `b=4&a=0.75`   |
+| Strobe      | `m=0.5&a=0.75` |
+| Short blink | `m=1&a=0.25`   |
+| Long blink  | `m=4&a=0.75`   |
 
 ### Sweep
 
@@ -35,9 +35,9 @@
 
 | Variation  | Parameters             |
 | :--------- | :--------------------- |
-| Sweep on 4 | `b=4&a=0.125`          |
-| Walk       | `b=1&a=1`              |
-| Long walk  | `b={numberOfLeds}&a=1` |
+| Sweep on 4 | `m=4&a=0.125`          |
+| Walk       | `m=1&a=1`              |
+| Long walk  | `m={numberOfLeds}&a=1` |
 
 ### Fill
 
