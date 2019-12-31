@@ -26,16 +26,20 @@ final int colorLight = color(249, 221, 214);
 final String[] programLabels = { "Black", "Blink", "Sweep", "Fill", "Alternate" };
 final String[] multiplierLabels = { "1/16", "1/8", "1/4", "1/2", "1", "2", "4", "8" };
 
-Textfield bpmTextField;
+PFont bigFont;
+PFont font;
+
+boolean isEditingBpm;
+CallbackListener bpmKnobCallbackListener;
 Knob bpmKnob;
+Textfield bpmTextField;
+
 Textlabel bpmTextLabel;
+Textlabel selectedProgramLabel;
 
 RadioButton pRadioButton;
 RadioButton mRadioButton;
 RadioButton aRadioButton;
-
-boolean isEditingBpm;
-CallbackListener bpmKnobCallbackListener;
 
 // BPM Control
 
@@ -46,10 +50,8 @@ public void applyBpmTextField() {
 }
 
 void setupBpmControl() {
-	PFont bigFont = createFont("DejaVu Sans Mono", 35);
-
 	bpmTextField = cp5.addTextfield("bpmTextField")
-	               .setPosition(20, 70)
+	               .setPosition(margin, 70)
 	               .setSize(200, 40)
 	               .setFocus(true)
 	               .setInputFilter(2)
@@ -108,7 +110,7 @@ void setupBpmControl() {
 	;
 
 	bpmTextLabel = cp5.addTextlabel("bpmTextLabel")
-	               .setPosition(450, 160)
+	               .setPosition(width / 2 + margin, 160)
 	               .setSize(100, 40)
 	               .setFont(bigFont)
 	               .setColor(colorLight);
@@ -147,6 +149,12 @@ void setupProgramControl() {
 
 		pRadioButton.addItem(toggleProgram, i);
 	}
+
+	selectedProgramLabel = cp5.addTextlabel("selectedProgramLabel")
+	               .setPosition(groupX, 250)
+	               .setSize(100, 40)
+	               .setFont(bigFont)
+	               .setColor(colorLight);
 }
 
 // Beat Multiplier Control
@@ -238,6 +246,8 @@ void setGuiFromModel() {
 		bpmKnob.setValue(bpm);
 	};
 
+	selectedProgramLabel.setStringValue(programLabels[selectedProgram]);
+
 	pRadioButton.activate(selectedProgram);
 	mRadioButton.activate(beatMultiplier);
 	aRadioButton.activate(animationMultiplier);
@@ -246,7 +256,8 @@ void setGuiFromModel() {
 void setupCp5() {
 	cp5 = new ControlP5(this);
 
-	PFont font = createFont("DejaVu Sans Mono", 20);
+	font = createFont("DejaVu Sans Mono", 20);
+	bigFont = createFont("DejaVu Sans Mono", 50);
 
 	cp5.setFont(font);
 	cp5.setColorBackground(colorBlack);
