@@ -151,10 +151,10 @@ void setupProgramControl() {
 	}
 
 	selectedProgramLabel = cp5.addTextlabel("selectedProgramLabel")
-	               .setPosition(groupX, 250)
-	               .setSize(100, 40)
-	               .setFont(bigFont)
-	               .setColor(colorLight);
+	                       .setPosition(groupX, 250)
+	                       .setSize(100, 40)
+	                       .setFont(bigFont)
+	                       .setColor(colorLight);
 }
 
 // Beat Multiplier Control
@@ -384,6 +384,36 @@ void controlEvent(ControlEvent controlEvent) {
 	}
 
 	isWaitingForArduinoValues = true;
+}
+
+void keyPressed() {
+	if (key == 'b' || key == 'B') {
+		arduino.write("P:0");
+	} else if (key == ENTER) {
+		arduino.write("S:");
+	} else if (key >= '0' && key <= '9') {
+		arduino.write("P:" + key);
+	} else if (keyCode == UP) {
+		arduino.write("B:" + (bpm + 1));
+	} else if (keyCode == DOWN) {
+		arduino.write("B:" + (bpm - 1));
+	} else if (keyCode == RIGHT) {
+		if (animationMultiplier == (multiplierLabels.length / 2)) return;
+
+		arduino.write("A:" + (animationMultiplier + 1));
+	} else if (keyCode == LEFT) {
+		if (animationMultiplier == 0) return;
+
+		arduino.write("A:" + (animationMultiplier - 1));
+	} else if (keyCode == 33) { // Page up
+		if (beatMultiplier == 0) return;
+
+		arduino.write("M:" + (beatMultiplier - 1));
+	} else if (keyCode == 34) { // Page down
+		if (beatMultiplier == multiplierLabels.length - 1) return;
+
+		arduino.write("M:" + (beatMultiplier + 1));
+	}
 }
 
 void setup() {
