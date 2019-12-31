@@ -8,6 +8,7 @@
 #define COMMAND_BEAT_MULTIPLIER       "M"
 #define COMMAND_ANIMATION_MULTIPLIER  "A"
 #define COMMAND_SYNC                  "S"
+#define COMMAND_TURN_ON_LED						"L"
 #define COMMAND_UPDATE_TO_SERIAL      "U:"
 
 #define BPM_MIN                   50
@@ -228,6 +229,12 @@ void sendAllToSerial() {
 	Serial.println();
 }
 
+void turnOnLed(int value) {
+	int ledIndex = constrain(value, 0, numberOfLeds - 1);
+
+	digitalWrite(leds[ledIndex], HIGH);
+}
+
 void readFromSerial() {
 	if (Serial.available() <= 0) {
 		return;
@@ -246,6 +253,8 @@ void readFromSerial() {
 		setAnimationMultiplierFromSerial(value.toInt());
 	} else if (command == COMMAND_SYNC) {
 		setShouldSync();
+	} else if (command == COMMAND_TURN_ON_LED) {
+		turnOnLed(value.toInt());
 	}
 }
 
