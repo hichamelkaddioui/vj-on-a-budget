@@ -23,6 +23,7 @@ final int colorDark = color(20, 33, 61);
 final int colorBlue = color(86, 201, 193);
 final int colorLight = color(249, 221, 214);
 
+final String[] programLabels = { "Black", "Blink", "Sweep", "Fill", "Alternate" };
 final String[] multiplierLabels = { "1/16", "1/8", "1/4", "1/2", "1", "2", "4", "8" };
 
 Textfield bpmTextField;
@@ -138,8 +139,10 @@ void setupProgramControl() {
 	               .setNoneSelectedAllowed(false)
 	;
 
-	for (int i = 0; i < 4; i++) {
-		Toggle toggleProgram = cp5.addToggle("P" + i).setLabel(i + "").setSize(100, 50);
+	for (int i = 0; i < programLabels.length; i++) {
+		String label = programLabels[i];
+		Toggle toggleProgram = cp5.addToggle("P" + i).setLabel(label).setSize(label.length() * 20 + 20, 50);
+
 		toggleProgram.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
 
 		pRadioButton.addItem(toggleProgram, i);
@@ -170,13 +173,10 @@ void setupBeatMultiplierControl() {
 	               .setNoneSelectedAllowed(false)
 	;
 
-	String label;
-	float value;
-
 	for (int i = 0; i < multiplierLabels.length; i++) {
-		label = multiplierLabels[i];
-
+		String label = multiplierLabels[i];
 		Toggle toggleBeatMultiplier = cp5.addToggle("M" + label).setLabel(label).setSize(100, 50);
+
 		toggleBeatMultiplier.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
 
 		mRadioButton.addItem(toggleBeatMultiplier, i);
@@ -205,14 +205,10 @@ void setupAnimationMultiplierControl() {
 	               .setColorLabel(colorBlack)
 	               .setNoneSelectedAllowed(false)
 	               .setColorBackground(colorLight);
-
-	String label;
-	float value;
-
 	for (int i = 0; i < multiplierLabels.length / 2 + 1; i++) {
-		label = multiplierLabels[i];
-
+		String label = multiplierLabels[i];
 		Toggle toggleAnimationMultiplier = cp5.addToggle("A" + label).setLabel(label).setSize(100, 50);
+
 		toggleAnimationMultiplier.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
 
 		aRadioButton.addItem(toggleAnimationMultiplier, i);
