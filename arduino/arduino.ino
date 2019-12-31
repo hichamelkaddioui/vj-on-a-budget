@@ -130,6 +130,22 @@ void random(int stepNumber) {
 	}
 }
 
+void breathe(int stepNumber) {
+	if (1 == stepNumber) {
+		for (int i = 0; i < numberOfLeds; i++) {
+			byte ledState = i == 4 ? HIGH : LOW;
+
+			digitalWrite(leds[i], ledState);
+		}
+	} else {
+		for (int i = 0; i < numberOfLeds; i++) {
+			byte ledState = i == 4 ? LOW : HIGH;
+
+			digitalWrite(leds[i], ledState);
+		}
+	}
+}
+
 typedef struct {
 	int numberOfSteps;
 	void (* handler)(int stepNumber);
@@ -141,7 +157,8 @@ program programs[] = {
 	{ numberOfLeds, sweep },
 	{ 2 * numberOfLeds, fill },
 	{ 2, alternate },
-	{ numberOfLeds, random }
+	{ numberOfLeds, random },
+	{ 2, breathe }
 };
 
 void runProgram(int elapsed, int animationLength) {
