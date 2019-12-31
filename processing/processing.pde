@@ -22,7 +22,7 @@ final int colorDark = color(20, 33, 61);
 final int colorBlue = color(86, 201, 193);
 final int colorLight = color(249, 221, 214);
 
-final String[] multiplierLabels = { "1/8", "1/4", "1/3", "1/2", "1", "2", "3", "4", "8" };
+final String[] multiplierLabels = { "1/16", "1/8", "1/4", "1/2", "1", "2", "4", "8" };
 
 Textfield bpmTextField;
 Knob bpmKnob;

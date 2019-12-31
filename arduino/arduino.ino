@@ -16,8 +16,8 @@
 
 #define FULL_ON_BUTTON_PIN        22
 
-double BEAT_MULTIPLIERS[] = { 1.0 / 8, 1.0 / 4, 1.0 / 3, 1.0 / 2, 1, 2, 3, 4, 8};
-double ANIMATION_MULTIPLIERS[] = { 1.0 / 8, 1.0 / 4, 1.0 / 3, 1.0 / 2, 1 };
+double BEAT_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1, 2, 4, 8};
+double ANIMATION_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1 };
 
 /*
  * LEDS
