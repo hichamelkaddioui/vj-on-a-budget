@@ -145,8 +145,8 @@ program programs[] = {
 };
 
 void runProgram(int elapsed, int animationLength) {
-	int numberOfSteps = programs[selectedProgram].numberOfSteps;
-	int currentStep = ceil(elapsed * numberOfSteps / animationLength);
+	double numberOfSteps = (double) programs[selectedProgram].numberOfSteps;
+	int currentStep = (long int) (elapsed * numberOfSteps / animationLength);
 
 	if (currentStep == numberOfSteps) {
 		return;
