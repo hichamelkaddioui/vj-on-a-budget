@@ -75,7 +75,7 @@ int selectedProgram;
 
 void initPrograms() {
 	stepNumber = 1;
-	selectedProgram = 2;
+	selectedProgram = 0;
 }
 
 void black(int stepNumber) {
@@ -122,6 +122,14 @@ void alternate(int stepNumber) {
 	}
 }
 
+void random(int stepNumber) {
+	for (int i = 0; i < numberOfLeds; i++) {
+		byte ledState = 0 == random(0, 2) ? HIGH : LOW;
+
+		digitalWrite(leds[i], ledState);
+	}
+}
+
 typedef struct {
 	int numberOfSteps;
 	void (* handler)(int stepNumber);
@@ -132,7 +140,8 @@ program programs[] = {
 	{ 1, blink },
 	{ numberOfLeds, sweep },
 	{ 2 * numberOfLeds, fill },
-	{ 2, alternate }
+	{ 2, alternate },
+	{ numberOfLeds, random }
 };
 
 void runProgram(int elapsed, int animationLength) {
