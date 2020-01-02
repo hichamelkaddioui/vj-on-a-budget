@@ -386,7 +386,7 @@ void controlEvent(ControlEvent controlEvent) {
 	isWaitingForArduinoValues = true;
 }
 
-final String programLetters = "azertyui";
+final String programLetters = "azertyuiopqsdfghjklmwxcvbn";
 
 void keyPressed() {
 	char lowercaseKey = Character.toLowerCase(key);
@@ -395,8 +395,11 @@ void keyPressed() {
 		int programIndex = programLetters.indexOf(lowercaseKey);
 
 		arduino.write("P:" + programIndex);
-	} else if (lowercaseKey == 'b') {
-		arduino.write("P:0");
+	} else if (key == 32) {
+		if (0 == selectedProgram)
+			arduino.write("P:1");
+		else
+			arduino.write("P:0");
 	} else if (key == ENTER) {
 		arduino.write("S:");
 	} else if (keyCode == UP) {
