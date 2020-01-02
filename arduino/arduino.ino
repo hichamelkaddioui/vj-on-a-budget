@@ -41,6 +41,18 @@ void initLeds() {
 	}
 }
 
+void turnOnLed(int value) {
+	int ledIndex = constrain(value, 0, numberOfLeds - 1);
+
+	digitalWrite(leds[ledIndex], HIGH);
+}
+
+void turnOffLed(int value) {
+	int ledIndex = constrain(value, 0, numberOfLeds - 1);
+
+	digitalWrite(leds[ledIndex], LOW);
+}
+
 void turnOnAllLeds() {
 	for (int i = 0; i < numberOfLeds; i++) {
 		digitalWrite(leds[i], HIGH);
@@ -92,12 +104,9 @@ void blink(int stepNumber) {
 }
 
 void sweep(int stepNumber) {
-	for (int i = 0; i < numberOfLeds; i++) {
-		if (i == stepNumber)
-			digitalWrite(leds[i], HIGH);
-		else
-			digitalWrite(leds[i], LOW);
-	}
+	turnOffAllLeds();
+
+	turnOnLed(stepNumber);
 }
 
 void columnSweep(int stepNumber) {
@@ -149,11 +158,9 @@ void clockwise(int stepNumber) {
 		case 7: ledIndex = 3; break;
 	}
 
-	for (int i = 0; i < numberOfLeds; i++) {
-		digitalWrite(leds[i], LOW);
-	}
+	turnOffAllLeds();
 
-	digitalWrite(leds[ledIndex], HIGH);
+	turnOnLed(ledIndex);
 }
 
 void counterClockwise(int stepNumber) {
@@ -170,11 +177,52 @@ void counterClockwise(int stepNumber) {
 		case 7: ledIndex = 1; break;
 	}
 
-	for (int i = 0; i < numberOfLeds; i++) {
-		digitalWrite(leds[i], LOW);
+	turnOffAllLeds();
+
+	turnOnLed(ledIndex);
+}
+
+void zigzag(int stepNumber) {
+	int ledIndex;
+
+	switch (stepNumber) {
+		case 0: ledIndex = 2; break;
+		case 1: ledIndex = 5; break;
+		case 2: ledIndex = 8; break;
+		case 3: ledIndex = 7; break;
+		case 4: ledIndex = 4; break;
+		case 5: ledIndex = 1; break;
+		case 6: ledIndex = 0; break;
+		case 7: ledIndex = 3; break;
+		case 8: ledIndex = 6; break;
 	}
 
-	digitalWrite(leds[ledIndex], HIGH);
+	turnOffAllLeds();
+
+	turnOnLed(ledIndex);
+}
+
+void snake(int stepNumber) {
+	boolean isPhaseOne = stepNumber < numberOfLeds;
+
+	int step = isPhaseOne ? stepNumber : stepNumber - numberOfLeds;
+	byte state = isPhaseOne ? HIGH : LOW;
+
+	int ledIndex;
+
+	switch (step) {
+		case 0: ledIndex = 2; break;
+		case 1: ledIndex = 5; break;
+		case 2: ledIndex = 8; break;
+		case 3: ledIndex = 7; break;
+		case 4: ledIndex = 4; break;
+		case 5: ledIndex = 1; break;
+		case 6: ledIndex = 0; break;
+		case 7: ledIndex = 3; break;
+		case 8: ledIndex = 6; break;
+	}
+
+	digitalWrite(leds[ledIndex], state);
 }
 
 void alternate(int stepNumber) {
@@ -198,18 +246,16 @@ void random(int stepNumber) {
 }
 
 void breathe(int stepNumber) {
-	if (1 == stepNumber) {
-		for (int i = 0; i < numberOfLeds; i++) {
-			byte ledState = i == 4 ? HIGH : LOW;
+	int middleLed = numberOfLeds / 2;
 
-			digitalWrite(leds[i], ledState);
-		}
+	if (0 == stepNumber) {
+		turnOffAllLeds();
+
+		turnOnLed(4);
 	} else {
-		for (int i = 0; i < numberOfLeds; i++) {
-			byte ledState = i == 4 ? LOW : HIGH;
+		turnOnAllLeds();
 
-			digitalWrite(leds[i], ledState);
-		}
+		turnOffLed(4);
 	}
 }
 
@@ -227,6 +273,8 @@ program programs[] = {
 	{ 2 * numberOfLeds, fill },
 	{ numberOfLeds - 1, clockwise },
 	{ numberOfLeds - 1, counterClockwise },
+	{ numberOfLeds, zigzag },
+	{ 2 * numberOfLeds, snake },
 	{ 2, alternate },
 	{ numberOfLeds, random },
 	{ 2, breathe }
@@ -324,12 +372,6 @@ void sendAllToSerial() {
 	Serial.print("&A=");
 	Serial.print(animationMultiplierIndex);
 	Serial.println();
-}
-
-void turnOnLed(int value) {
-	int ledIndex = constrain(value, 0, numberOfLeds - 1);
-
-	digitalWrite(leds[ledIndex], HIGH);
 }
 
 void readFromSerial() {
