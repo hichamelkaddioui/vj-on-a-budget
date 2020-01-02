@@ -16,8 +16,8 @@
 
 #define FULL_ON_BUTTON_PIN        22
 
-double BEAT_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1.0, 2.0, 4.0, 8.0 };
-double ANIMATION_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1.0 };
+const double BEAT_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1.0, 2.0, 4.0, 8.0 };
+const double ANIMATION_MULTIPLIERS[] = { 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0 / 2, 1.0 };
 
 /*
  * LEDS
@@ -74,7 +74,7 @@ int stepNumber;
 int selectedProgram;
 
 void initPrograms() {
-	stepNumber = 1;
+	stepNumber = -1;
 	selectedProgram = 0;
 }
 
@@ -331,7 +331,7 @@ int getAnimationLength() {
 }
 
 void resetLoop() {
-	stepNumber = 1;
+	stepNumber = -1;
 
 	chrono.restart();
 
