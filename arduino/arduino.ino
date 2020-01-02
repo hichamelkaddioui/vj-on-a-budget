@@ -5,8 +5,8 @@ const char DEBUG[100];
 
 #define ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
 
-#define LINE_NUMBER								3
-#define COL_NUMBER								3
+#define NUMBER_OF_LINES								3
+#define NUMBER_OF_COLUMNS							3
 
 #define COMMAND_PROGRAM               "P"
 #define COMMAND_BPM                   "B"
@@ -113,19 +113,19 @@ void columnSweep(int stepNumber) {
 	byte ledState;
 
 	for (int i = 0; i < numberOfLeds; i++) {
-		ledState = stepNumber * COL_NUMBER <= i && i < (stepNumber + 1) * COL_NUMBER ? HIGH : LOW;
+		ledState = stepNumber * NUMBER_OF_COLUMNS <= i && i < (stepNumber + 1) * NUMBER_OF_COLUMNS ? HIGH : LOW;
 
 		digitalWrite(leds[i], ledState);
 	}
 }
 
 void lineSweep(int stepNumber) {
-	byte ledState;
+	int lineNumber;
 
 	for (int i = 0; i < numberOfLeds; i++) {
-		ledState = stepNumber == i % LINE_NUMBER ? HIGH : LOW;
+		lineNumber = map(i % NUMBER_OF_LINES, 0, NUMBER_OF_LINES - 1, NUMBER_OF_LINES - 1, 0);
 
-		digitalWrite(leds[i], ledState);
+		digitalWrite(leds[i], stepNumber == lineNumber);
 	}
 }
 
@@ -268,8 +268,8 @@ program programs[] = {
 	{ 1, black },
 	{ 1, blink },
 	{ numberOfLeds, sweep },
-	{ 3, columnSweep },
-	{ 3, lineSweep },
+	{ NUMBER_OF_COLUMNS, columnSweep },
+	{ NUMBER_OF_LINES, lineSweep },
 	{ 2 * numberOfLeds, fill },
 	{ numberOfLeds - 1, clockwise },
 	{ numberOfLeds - 1, counterClockwise },
@@ -303,8 +303,6 @@ int beatMultiplierIndex;
 double animationMultiplier;
 int animationMultiplierIndex;
 bool shouldSync;
-String command;
-String value;
 
 void initAnimation() {
 	bpm = 120;
@@ -379,8 +377,8 @@ void readFromSerial() {
 		return;
 	}
 
-	command = Serial.readStringUntil(':');
-	value = Serial.readStringUntil('\n');
+	String command = Serial.readStringUntil(':');
+	String value = Serial.readStringUntil('\n');
 
 	if (command == COMMAND_PROGRAM) {
 		setProgramFromSerial(value.toInt());
