@@ -386,13 +386,19 @@ void controlEvent(ControlEvent controlEvent) {
 	isWaitingForArduinoValues = true;
 }
 
+final String programLetters = "azertyui";
+
 void keyPressed() {
-	if (key == 'b' || key == 'B') {
+	char lowercaseKey = Character.toLowerCase(key);
+
+	if (0 <= programLetters.indexOf(lowercaseKey)) {
+		int programIndex = programLetters.indexOf(lowercaseKey);
+
+		arduino.write("P:" + programIndex);
+	} else if (lowercaseKey == 'b') {
 		arduino.write("P:0");
 	} else if (key == ENTER) {
 		arduino.write("S:");
-	} else if (key >= '0' && key <= '9') {
-		arduino.write("P:" + key);
 	} else if (keyCode == UP) {
 		arduino.write("B:" + (bpm + 1));
 	} else if (keyCode == DOWN) {
@@ -405,11 +411,13 @@ void keyPressed() {
 		if (animationMultiplier == 0) return;
 
 		arduino.write("A:" + (animationMultiplier - 1));
-	} else if (keyCode == 33) { // Page up
+	} else if (keyCode == 33) {
+		// Page up
 		if (beatMultiplier == 0) return;
 
 		arduino.write("M:" + (beatMultiplier - 1));
-	} else if (keyCode == 34) { // Page down
+	} else if (keyCode == 34) {
+		// Page down
 		if (beatMultiplier == multiplierLabels.length - 1) return;
 
 		arduino.write("M:" + (beatMultiplier + 1));
