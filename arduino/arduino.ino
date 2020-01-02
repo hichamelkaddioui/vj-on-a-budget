@@ -116,11 +116,6 @@ void lineSweep(int stepNumber) {
 	for (int i = 0; i < numberOfLeds; i++) {
 		ledState = stepNumber == i % LINE_NUMBER ? HIGH : LOW;
 
-		Serial.print(COMMAND_UPDATE_TO_SERIAL);
-		sprintf(DEBUG, "Step %d, LED %d %s", stepNumber, i, ledState == HIGH ? "HIGH" : "LOW");
-		Serial.print(DEBUG);
-		Serial.println();
-
 		digitalWrite(leds[i], ledState);
 	}
 }
@@ -138,6 +133,48 @@ void fill(int stepNumber) {
 	}
 
 	digitalWrite(leds[ledIndex], state);
+}
+
+void clockwise(int stepNumber) {
+	int ledIndex;
+
+	switch (stepNumber) {
+		case 0: ledIndex = 0; break;
+		case 1: ledIndex = 1; break;
+		case 2: ledIndex = 2; break;
+		case 3: ledIndex = 5; break;
+		case 4: ledIndex = 8; break;
+		case 5: ledIndex = 7; break;
+		case 6: ledIndex = 6; break;
+		case 7: ledIndex = 3; break;
+	}
+
+	for (int i = 0; i < numberOfLeds; i++) {
+		digitalWrite(leds[i], LOW);
+	}
+
+	digitalWrite(leds[ledIndex], HIGH);
+}
+
+void counterClockwise(int stepNumber) {
+	int ledIndex;
+
+	switch (stepNumber) {
+		case 0: ledIndex = 0; break;
+		case 1: ledIndex = 3; break;
+		case 2: ledIndex = 6; break;
+		case 3: ledIndex = 7; break;
+		case 4: ledIndex = 8; break;
+		case 5: ledIndex = 5; break;
+		case 6: ledIndex = 2; break;
+		case 7: ledIndex = 1; break;
+	}
+
+	for (int i = 0; i < numberOfLeds; i++) {
+		digitalWrite(leds[i], LOW);
+	}
+
+	digitalWrite(leds[ledIndex], HIGH);
 }
 
 void alternate(int stepNumber) {
@@ -188,6 +225,8 @@ program programs[] = {
 	{ 3, columnSweep },
 	{ 3, lineSweep },
 	{ 2 * numberOfLeds, fill },
+	{ numberOfLeds - 1, clockwise },
+	{ numberOfLeds - 1, counterClockwise },
 	{ 2, alternate },
 	{ numberOfLeds, random },
 	{ 2, breathe }
