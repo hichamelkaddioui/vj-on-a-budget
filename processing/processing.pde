@@ -57,12 +57,6 @@ RadioButton aRadioButton;
 
 // BPM Control
 
-public void applyBpmTextField() {
-	float inField = Float.parseFloat(bpmTextField.getText());
-	arduino.write("B:" + inField);
-	bpmTextField.clear();
-}
-
 void setupBpmControl() {
 	bpmTextField = cp5.addTextfield("bpmTextField")
 	               .setPosition(margin, 70)
@@ -364,7 +358,10 @@ void controlEvent(ControlEvent controlEvent) {
 	}
 
 	if (controlEvent.isFrom(bpmTextField)) {
-		applyBpmTextField();
+		arduino.write("B:" + bpmTextField.getText());
+
+		bpmTextField.clear();
+		bpmTextField.setFocus(false);
 	}
 
 	if (controlEvent.isFrom(pRadioButton)) {
@@ -400,10 +397,10 @@ void controlEvent(ControlEvent controlEvent) {
 	isWaitingForArduinoValues = true;
 }
 
-final String programLetters = "azertyuiopqsdfghjklmwxcvbn";
-
 void keyPressed() {
 	char lowercaseKey = Character.toLowerCase(key);
+
+	String programLetters = "azertyuiopqsdfghjklmwxcvbn";
 
 	if (0 <= programLetters.indexOf(lowercaseKey)) {
 		int programIndex = programLetters.indexOf(lowercaseKey);
@@ -416,6 +413,9 @@ void keyPressed() {
 			arduino.write("P:0");
 	} else if (key == ENTER) {
 		arduino.write("S:");
+
+		// ENTER might be used to set the BPM in the text field
+		arduino.write("\n");
 	} else if (keyCode == UP) {
 		arduino.write("B:" + (bpm + 1));
 	} else if (keyCode == DOWN) {
