@@ -1,14 +1,19 @@
 #include <LightChrono.h>
 #include <EasyButton.h>
 
+const char DEBUG[100];
+
 #define ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
+
+#define LINE_NUMBER								3
+#define COL_NUMBER								3
 
 #define COMMAND_PROGRAM               "P"
 #define COMMAND_BPM                   "B"
 #define COMMAND_BEAT_MULTIPLIER       "M"
 #define COMMAND_ANIMATION_MULTIPLIER  "A"
 #define COMMAND_SYNC                  "S"
-#define COMMAND_TURN_ON_LED                                             "L"
+#define COMMAND_TURN_ON_LED           "L"
 #define COMMAND_UPDATE_TO_SERIAL      "U:"
 
 #define BPM_MIN                   50
@@ -98,24 +103,25 @@ void sweep(int stepNumber) {
 void columnSweep(int stepNumber) {
 	byte ledState;
 
-	if (1 == stepNumber) {
-		for (int i = 0; i < numberOfLeds; i++) {
-			ledState = i < 3 ? HIGH : LOW;
+	for (int i = 0; i < numberOfLeds; i++) {
+		ledState = stepNumber * COL_NUMBER <= i && i < (stepNumber + 1) * COL_NUMBER ? HIGH : LOW;
 
-			digitalWrite(leds[i], ledState);
-		}
-	} else if (2 == stepNumber) {
-		for (int i = 0; i < numberOfLeds; i++) {
-			ledState = 3 <= i && i < 6 ? HIGH : LOW;
+		digitalWrite(leds[i], ledState);
+	}
+}
 
-			digitalWrite(leds[i], ledState);
-		}
-	} else {
-		for (int i = 0; i < numberOfLeds; i++) {
-			ledState = 6 <= i ? HIGH : LOW;
+void lineSweep(int stepNumber) {
+	byte ledState;
 
-			digitalWrite(leds[i], ledState);
-		}
+	for (int i = 0; i < numberOfLeds; i++) {
+		ledState = stepNumber == i % LINE_NUMBER ? HIGH : LOW;
+
+		Serial.print(COMMAND_UPDATE_TO_SERIAL);
+		sprintf(DEBUG, "Step %d, LED %d %s", stepNumber, i, ledState == HIGH ? "HIGH" : "LOW");
+		Serial.print(DEBUG);
+		Serial.println();
+
+		digitalWrite(leds[i], ledState);
 	}
 }
 
@@ -180,6 +186,7 @@ program programs[] = {
 	{ 1, blink },
 	{ numberOfLeds, sweep },
 	{ 3, columnSweep },
+	{ 3, lineSweep },
 	{ 2 * numberOfLeds, fill },
 	{ 2, alternate },
 	{ numberOfLeds, random },
