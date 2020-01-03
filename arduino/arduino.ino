@@ -145,22 +145,36 @@ void fill(int stepNumber) {
 }
 
 void clockwise(int stepNumber) {
-	int ledIndex;
+	const boolean isFirstEdge = stepNumber < NUMBER_OF_COLUMNS;
+	const boolean isSecondEdge = stepNumber < NUMBER_OF_COLUMNS + NUMBER_OF_LINES - 2;
+	const boolean isThirdEdge = stepNumber <= (2 * NUMBER_OF_COLUMNS) + (NUMBER_OF_LINES - 2) - 1;
 
-	switch (stepNumber) {
-		case 0: ledIndex = 0; break;
-		case 1: ledIndex = 1; break;
-		case 2: ledIndex = 2; break;
-		case 3: ledIndex = 5; break;
-		case 4: ledIndex = 8; break;
-		case 5: ledIndex = 7; break;
-		case 6: ledIndex = 6; break;
-		case 7: ledIndex = 3; break;
+	const int secondEdgeStartIndex = (NUMBER_OF_COLUMNS - 1) * NUMBER_OF_LINES + 1;
+	const int thirdEdgeStartIndex = NUMBER_OF_COLUMNS * NUMBER_OF_LINES - 1;
+	const int fourthEdgeStartIndex = NUMBER_OF_LINES - 2;
+
+	int ledNumber;
+	int elapsed;
+
+	if (isFirstEdge) {
+		ledNumber = stepNumber * NUMBER_OF_COLUMNS;
+	} else if (isSecondEdge) {
+		elapsed = NUMBER_OF_COLUMNS;
+
+		ledNumber = secondEdgeStartIndex + stepNumber - elapsed;
+	} else if (isThirdEdge) {
+		elapsed = NUMBER_OF_COLUMNS + (NUMBER_OF_LINES - 2);
+
+		ledNumber = thirdEdgeStartIndex - NUMBER_OF_LINES * (stepNumber - elapsed);
+	} else {
+		elapsed = 2 * NUMBER_OF_COLUMNS + (NUMBER_OF_LINES - 2);
+
+		ledNumber = fourthEdgeStartIndex - (stepNumber - elapsed);
 	}
 
 	turnOffAllLeds();
 
-	turnOnLed(ledIndex);
+	turnOnLed(ledNumber);
 }
 
 void counterClockwise(int stepNumber) {
@@ -271,8 +285,8 @@ program programs[] = {
 	{ NUMBER_OF_COLUMNS, columnSweep },
 	{ NUMBER_OF_LINES, lineSweep },
 	{ 2 * numberOfLeds, fill },
-	{ numberOfLeds - 1, clockwise },
-	{ numberOfLeds - 1, counterClockwise },
+	{ 2 * (NUMBER_OF_COLUMNS + NUMBER_OF_LINES - 2), clockwise },
+	{ 2 * (NUMBER_OF_COLUMNS + NUMBER_OF_LINES - 2), counterClockwise },
 	{ numberOfLeds, zigzag },
 	{ 2 * numberOfLeds, snake },
 	{ 2, alternate },
