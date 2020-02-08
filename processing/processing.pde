@@ -32,11 +32,12 @@ final String[] programLabels = {
 	"Fill",
 	"Clockwise",
 	"Trigonometric",
+	"Cross",
 	"Zigzag",
 	"Snake",
+	"Breathe",
 	"Alternate",
-	"Random",
-	"Breathe"
+	"Random"
 };
 final String[] multiplierLabels = { "1/16", "1/8", "1/4", "1/2", "1", "2", "4", "8" };
 

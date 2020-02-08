@@ -145,6 +145,25 @@ void fill(int stepNumber) {
 }
 
 void clockwise(int stepNumber) {
+	int ledIndex;
+
+	switch (stepNumber) {
+		case 0: ledIndex = 0; break;
+		case 1: ledIndex = 1; break;
+		case 2: ledIndex = 2; break;
+		case 3: ledIndex = 5; break;
+		case 4: ledIndex = 8; break;
+		case 5: ledIndex = 7; break;
+		case 6: ledIndex = 6; break;
+		case 7: ledIndex = 3; break;
+	}
+
+	turnOffAllLeds();
+
+	turnOnLed(ledIndex);
+}
+
+void trigonometric(int stepNumber) {
 	const boolean isFirstEdge = stepNumber < NUMBER_OF_COLUMNS;
 	const boolean isSecondEdge = stepNumber < NUMBER_OF_COLUMNS + NUMBER_OF_LINES - 2;
 	const boolean isThirdEdge = stepNumber <= (2 * NUMBER_OF_COLUMNS) + (NUMBER_OF_LINES - 2) - 1;
@@ -177,23 +196,22 @@ void clockwise(int stepNumber) {
 	turnOnLed(ledNumber);
 }
 
-void counterClockwise(int stepNumber) {
-	int ledIndex;
-
+void cross(int stepNumber) {
 	switch (stepNumber) {
-		case 0: ledIndex = 0; break;
-		case 1: ledIndex = 3; break;
-		case 2: ledIndex = 6; break;
-		case 3: ledIndex = 7; break;
-		case 4: ledIndex = 8; break;
-		case 5: ledIndex = 5; break;
-		case 6: ledIndex = 2; break;
-		case 7: ledIndex = 1; break;
+		case 0:
+			turnOffAllLeds();
+		case 1:
+			turnOnLed(2);
+			turnOnLed(8);
+			break;
+		case 2:
+			turnOnLed(4);
+			break;
+		case 3:
+			turnOnLed(0);
+			turnOnLed(6);
+			break;
 	}
-
-	turnOffAllLeds();
-
-	turnOnLed(ledIndex);
 }
 
 void zigzag(int stepNumber) {
@@ -286,12 +304,13 @@ program programs[] = {
 	{ NUMBER_OF_LINES, lineSweep },
 	{ 2 * numberOfLeds, fill },
 	{ 2 * (NUMBER_OF_COLUMNS + NUMBER_OF_LINES - 2), clockwise },
-	{ 2 * (NUMBER_OF_COLUMNS + NUMBER_OF_LINES - 2), counterClockwise },
+	{ 2 * (NUMBER_OF_COLUMNS + NUMBER_OF_LINES - 2), trigonometric },
+	{ 4, cross },
 	{ numberOfLeds, zigzag },
 	{ 2 * numberOfLeds, snake },
+	{ 2, breathe },
 	{ 2, alternate },
-	{ numberOfLeds, random },
-	{ 2, breathe }
+	{ numberOfLeds, random }
 };
 
 void runProgram(int elapsed, int animationLength) {
