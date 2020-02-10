@@ -1,8 +1,6 @@
 #include <LightChrono.h>
 #include <EasyButton.h>
 
-const char DEBUG[100];
-
 #define ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
 
 #define NUMBER_OF_LINES								3
