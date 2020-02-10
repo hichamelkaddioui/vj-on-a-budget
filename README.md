@@ -30,11 +30,16 @@ Install the `ControlP5` library
 4. Connect all the stripes `GND` lines to the collector (C) pin of a NPN transistor
 5. Connect all the base (B) pins of the NPN transistors to the digital pins you want to use on the Arduino
 6. Connect all the emitter (E) pins of the NPN transistors to the Arduino's `GND` pin
+7. Add some resistors here and there
+
+This schema illustrates, roughly speaking, how LED stripes should be connected to the Arduino and power supply.
+
+![Schematics](./docs/schematics.svg)
 
 ## Usage
 
 1. Connect the Arduino board to your computer
-2. Open and run `processing/processing.pde`.
+2. Open and run `processing/processing.pde`
 
 ## In depth
 
@@ -67,7 +72,7 @@ A _program_ is the implementation of an animation, in Arduino. It consists of:
 
 Arduino evenly divides the animation length by the number of steps, and repeatedly calls the handler with the current step number. Then handler is in charge of turning LEDs on and off given this number.
 
-For instance, for a BPM of `100`, a loop length of `4 beats`, an animation length of `1/2` and a program that consists of `4` steps:
+For instance, for a BPM of `100`, a loop length of `4` beats, an animation length of `1/2` and a program that consists of `4` steps:
 
 - the loop length will be `(60 / 100) * 4 = 2.4 s = 2400 ms`
 - the animation length will be `2.4 * 0.5 = 1.2 s = 1200 ms`
